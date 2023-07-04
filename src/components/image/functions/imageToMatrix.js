@@ -1,35 +1,32 @@
-export function imageToMatrix(image) {
-  // Create a canvas element
-  const canvas = document.createElement("canvas");
-  const ctx = canvas.getContext("2d");
+export function imageToMatrix(imageUrl, setPixelMatrix) {
+  const img = new Image();
+  img.src = imageUrl;
 
-  // Set the canvas dimensions to match the image
-  canvas.width = image.width;
-  canvas.height = image.height;
+  img.onload = () => {
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    canvas.width = img.width;
+    canvas.height = img.height;
+    ctx.drawImage(img, 0, 0);
 
-  // Draw the image onto the canvas
-  ctx.drawImage(image, 0, 0);
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const pixels = imageData.data;
 
-  // Get the pixel data from the canvas
-  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-  const pixels = imageData.data;
+    const matrix = [];
+    for (let y = 0; y < canvas.height; y++) {
+      const row = [];
+      for (let x = 0; x < canvas.width; x++) {
+        const index = (y * canvas.width + x) * 4;
+        const red = pixels[index];
+        const green = pixels[index + 1];
+        const blue = pixels[index + 2];
+        const alpha = pixels[index + 3];
 
-  // Convert the pixel data into a 2D matrix
-  const matrix = [];
-  for (let y = 0; y < canvas.height; y++) {
-    const row = [];
-    for (let x = 0; x < canvas.width; x++) {
-      const red = pixels[(y * canvas.width + x) * 4];
-      const green = pixels[(y * canvas.width + x) * 4 + 1];
-      const blue = pixels[(y * canvas.width + x) * 4 + 2];
-      const alpha = pixels[(y * canvas.width + x) * 4 + 3];
-
-      // Store the pixel as an object with RGBA values
-      row.push({ red, green, blue, alpha });
+        row.push({ red, green, blue, alpha });
+      }
+      matrix.push(row);
     }
-    matrix.push(row);
-  }
 
-  // The matrix variable now contains a 2D representation of the image pixels
-  console.log(matrix);
+    setPixelMatrix(matrix);
+  };
 }

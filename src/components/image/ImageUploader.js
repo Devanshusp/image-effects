@@ -1,7 +1,9 @@
 import React, { useState } from "react";
+import { imageToMatrix } from "./functions/ImageToMatrix.js";
 
 function ImageUploader() {
   const [selectedImage, setSelectedImage] = useState(null);
+  const [pixelMatrix, setPixelMatrix] = useState([]);
 
   const handleImageUpload = (event) => {
     const file = event.target.files[0];
@@ -9,6 +11,7 @@ function ImageUploader() {
 
     reader.onload = () => {
       setSelectedImage(reader.result);
+      imageToMatrix(reader.result, setPixelMatrix);
     };
 
     if (file) {
@@ -17,11 +20,9 @@ function ImageUploader() {
   };
 
   return (
-    <div className="ImageUploader">
+    <div>
       <input type="file" accept="image/*" onChange={handleImageUpload} />
-      {selectedImage && (
-        <img className="original" src={selectedImage} alt="Selected" />
-      )}
+      {selectedImage && <img src={selectedImage} alt="Selected" />}
     </div>
   );
 }
